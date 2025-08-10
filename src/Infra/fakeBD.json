@@ -1,0 +1,15 @@
+{
+    "users": [
+        { 
+            "id": 123,
+            "nome": "Renan",
+            "ativo": false
+        },
+        { 
+            "id": 124,
+            "nome": "Jessica",
+            "ativo": true
+        }
+    ],
+    "provas": []
+}

@@ -1,24 +1,25 @@
-//CRUD     - READ
-import {usuarios, UsuarioType}  from './usuarios';
+import UsuarioRepositorio from "./Infra/UsuarioRepositorio";
+import { Usuario } from "./usuarios";
+import express, {Request, Response} from 'express';
 
-const usuariosBD = retornaUsuarios();
-console.log('usuariosBD',usuariosBD);
 
-const usuarios1 = retornaUsuarioPorId(1232345);
-mostraEmTela()
-console.log('usuarios1',usuarios1);
+const app = express();
+const port = 3000;
 
-function mostraEmTela(): void {
-    console.log("exibindo em tela");
-}
+app.get('/', (req: Request, res: Response) => {
+    res.send('Bem vindo a primeira rota!!!')
+});
 
-// hoisting
-function retornaUsuarios () {
-    return usuarios;
-}
-function retornaUsuarioPorId (id: number): UsuarioType | undefined {
-    console.log('tipo do id =', typeof id);
-    return usuarios.find(user => user.id === id);
-}
+app.listen(port, () => {
+    console.info(`Servidor rodando na porta: http://localhost:${port}` )
+});
 
-// criar atualiza e delete
+// const usuarioRepositorio = new UsuarioRepositorio;
+
+// const usuario = new Usuario("Alberto",true,18n);
+
+
+// console.log(
+//     usuarioRepositorio.criarUsario(usuario)
+// )
+
