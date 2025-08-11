@@ -10,7 +10,7 @@ export const usuarios: UsuarioType[] = [
        nome: 'Jessica',
        ativo: true
     },
-]
+];
 
 export type UsuarioType = {
     id: number,
