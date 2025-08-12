@@ -170,35 +170,144 @@ npm install --save-dev eslint @typescript-eslint/parser @typescript-eslint/eslin
 npx eslint --init
 ```
 
-Criar arquivo de configuração .eslintrc.json: 
+(Atualizado 2025) Respostas que usei na Configuração ao usar o npx eslint --init
+```bash
+npx eslint --init
+You can also run this command directly using 'npm init @eslint/config@latest'.
 
-```json
-{
-    "parser": "@typescript-eslint/parser",
-    "extends": [
-        "eslint:recommended",
-        "plugin:@typescript-eslint/recommended"
-    ],
-    "parserOptions": {
-        "ecmaVersion": 2020,
-        "sourceType": "module"
-    },
-    "rules": {
-      "@typescript-eslint/semi": ["error", "always"], // Adiciona ponto e vírgula
-      "semi": ["error", "always"], 
-        // Suas regras personalizadas aqui
-    }
-}
+> tsbackend@1.0.0 npx
+> create-config
 
+@eslint/create-config: v1.10.0
+
+√ What do you want to lint? · javascript, json, jsonc, md
+√ How would you like to use ESLint? · problems
+√ What type of modules does your project use? · esm
+√ Which framework does your project use? · none
+√ Does your project use TypeScript? · No / Yes
+√ Where does your code run? · node
+√ Which language do you want your configuration file be written in? · ts
+√ What flavor of Markdown do you want to lint? · gfm
+Jiti is required for Node.js <24.3.0 to read TypeScript configuration files.
+√ Would you like to add Jiti as a devDependency? · No / Yes
+The config that you've selected requires the following dependencies:
 ```
 
-Adiciona um script para o lint:
+(Atualizado 2025) Criar, ou modificar, o arquivo de configuração .eslintrc.mts: 
+
+```ts
+import js from '@eslint/js';
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
+import json from '@eslint/json';
+import markdown from '@eslint/markdown';
+import { defineConfig } from 'eslint/config';
+
+const tsConfig = tseslint.config(
+  ...tseslint.configs.recommended,
+  {
+    languageOptions: {
+      globals: globals.node,
+    },
+    rules: {
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': 'warn',
+      'quotes': ['error', 'single'], // força aspas simples
+      'semi': ['error', 'always'],   // força ponto e vírgula
+    },
+  }
+);
+
+export default defineConfig([
+  { files: ['**/*.{js,mjs,cjs,ts,mts,cts}'], plugins: { js }, extends: ['js/recommended'], languageOptions: { globals: globals.node } },
+  tsConfig,
+  { files: ['**/*.json'], plugins: { json }, language: 'json/json', extends: ['json/recommended'] },
+  { files: ['**/*.jsonc'], plugins: { json }, language: 'json/jsonc', extends: ['json/recommended'] },
+  { files: ['**/*.md'], plugins: { markdown }, language: 'markdown/gfm', extends: ['markdown/recommended'] },
+]);
+```
+
+versão sem erro de tipo
+```ts
+import js from '@eslint/js';
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
+import json from '@eslint/json';
+import markdown from '@eslint/markdown';
+import type { FlatConfig } from '@typescript-eslint/utils/ts-eslint';
+
+const tsConfig: FlatConfig.Config[] = [
+  ...tseslint.configs.recommended,
+  {
+    files: ['**/*.{ts,mts,cts}'],
+    languageOptions: {
+      globals: globals.node,
+    },
+    rules: {
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': 'warn',
+      'quotes': ['error', 'single'],
+      'semi': ['error', 'always'],
+    },
+  }
+];
+
+export default [
+  {
+    files: ['**/*.{js,mjs,cjs}'],
+    ...js.configs.recommended,
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
+  ...tsConfig,
+  {
+    files: ['**/*.json'],
+    language: 'json/json',
+    ...json.configs.recommended,
+    plugins: { json },
+  },
+  {
+    files: ['**/*.jsonc'],
+    language: 'json/jsonc',
+    ...json.configs.recommended,
+    plugins: { json },
+  },
+  {
+    files: ['**/*.md'],
+    plugins: { markdown },
+    language: 'markdown/gfm',
+    ...markdown.configs.recommended,
+  },
+];
+```
+
+Adiciona um script para o lint no package.json:
 ```json
 {
     "scripts": {
         //... demais scripts...
         "lint": "eslint ./src/**/*.ts --fix"
     }
+}
+```
+
+Adicionar o eslint no settings.json do vscode (Aperte 'ctrl + alt + p' e busque por settings.json e escolha a opção default ) 
+
+```json
+{
+    "workbench.iconTheme": "vscode-icons",
+    // Configurações do ESLint
+    "eslint.validate": [
+        "javascript",
+        "typescript"
+    ],
+    // Actions no save
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit"
+    },
+    // Configurações gerais do editor
+    "editor.formatOnSave": true,
 }
 ```
 

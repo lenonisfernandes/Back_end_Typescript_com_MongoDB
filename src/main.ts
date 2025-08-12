@@ -1,6 +1,6 @@
 import UsuarioRepositorio from "./Infra/UsuarioRepositorio";
 import { Usuario } from "./usuarios";
-import express, {Request, Response} from 'express';
+import express, { Request, Response } from 'express';
 
 
 const app = express();
@@ -11,7 +11,7 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 app.listen(port, () => {
-    console.info(`Servidor rodando na porta: http://localhost:${port}` )
+    console.info(`Servidor rodando na porta: http://localhost:${port}`)
 });
 
 // const usuarioRepositorio = new UsuarioRepositorio;

@@ -10,7 +10,7 @@ export const usuarios: UsuarioSchema[] = [
        nome: 'Jessica',
        ativo: true
     },
-]
+];
 
 export type UsuarioSchema = {
     id: number,
