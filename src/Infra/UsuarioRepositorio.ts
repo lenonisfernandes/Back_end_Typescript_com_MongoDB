@@ -45,4 +45,41 @@ export default class UsuarioRepositorio {
         this.reescreverBD(bdAtualizado);
         return usuarios;
     }
+
+    public deletarUsuario(id: number): boolean {
+        const usuarios = this.getUsuarios();
+        const indiceUsuario = usuarios.findIndex(user => user.id === id);
+
+        if (indiceUsuario === -1) {
+            return false; // Usuário não encontrado
+        }
+
+        usuarios.splice(indiceUsuario, 1);
+        const bdAtualizado = this.acessoDB();
+        bdAtualizado.users = usuarios;
+
+        return this.reescreverBD(bdAtualizado);
+    }
+
+    public atualizarUsuario(id: number, dadosAtualizados: Partial<Usuario>): UsuarioSchema | null {
+        const usuarios = this.getUsuarios();
+        const indiceUsuario = usuarios.findIndex(user => user.id === id);
+
+        if (indiceUsuario === -1) {
+            return null; // Usuário não encontrado
+        }
+
+        // Atualiza apenas os campos fornecidos, mantendo os existentes
+        usuarios[indiceUsuario] = {
+            ...usuarios[indiceUsuario],
+            ...dadosAtualizados,
+            id // Garante que o ID não seja alterado
+        };
+
+        const bdAtualizado = this.acessoDB();
+        bdAtualizado.users = usuarios;
+
+        const sucesso = this.reescreverBD(bdAtualizado);
+        return sucesso ? usuarios[indiceUsuario] : null;
+    }
 }

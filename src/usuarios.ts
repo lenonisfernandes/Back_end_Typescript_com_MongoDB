@@ -6,8 +6,9 @@ export class Usuario {
     NumeroDoc?: number;
     senha?: string;
 
-    constructor(nome: string, ativo: boolean, saldo?: bigint) {
-        this.id = Math.round(Math.random() * 100);
+    constructor(id: number, nome: string, ativo: boolean, saldo?: bigint) {
+        //this.id = Math.round(Math.random() * 100);
+        this.id = id;
         this.nome = nome;
         this.ativo = ativo;
         this.saldo = saldo;

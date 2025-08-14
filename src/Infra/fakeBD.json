@@ -1,1 +1,1 @@
-{"users":[{"id":123,"nome":"Renan","ativo":false,"senha":"secreta"},{"id":124,"nome":"Jessica","ativo":true},{},{"id":95,"nome":"Alfred","ativo":true},{"ativo":false,"id":43,"nome":"Francisco","senha":"minha senha"}],"provas":[]}
+{"users":[{"id":123,"nome":"Renan","ativo":false,"senha":"secreta"},{"id":124,"nome":"Jessica","ativo":true},{},{"ativo":false,"id":43,"nome":"Francisco","senha":"minha senha"}],"provas":[]}
