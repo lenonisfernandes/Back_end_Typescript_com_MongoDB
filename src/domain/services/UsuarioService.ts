@@ -1,8 +1,8 @@
 //CRUD     - READ
-import UsuarioRepositorio from "../../Infra/UsuarioRepositorio";
-import { Usuario, UsuarioSchema } from "../../usuarios";
+import UsuarioRepositorio from '../../Infra/UsuarioRepositorio';
+import { Usuario, UsuarioSchema } from '../../usuarios';
 
-const usuarioRepositorio = new UsuarioRepositorio()
+const usuarioRepositorio = new UsuarioRepositorio();
 
 // hoisting
 function retornaUsuarios () {

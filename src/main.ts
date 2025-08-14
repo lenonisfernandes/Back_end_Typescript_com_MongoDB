@@ -1,25 +1,19 @@
-import UsuarioRepositorio from "./Infra/UsuarioRepositorio";
-import { Usuario } from "./usuarios";
+import routes from './Api/routes';
 import express, { Request, Response } from 'express';
 
 
 const app = express();
 const port = 3000;
 
+app.use(express.json());
+
 app.get('/', (req: Request, res: Response) => {
-    res.send('Bem vindo a primeira rota!!!')
+    res.json('Bem vindo a primeira rota!!!');
 });
+
+app.use('/api', routes);
 
 app.listen(port, () => {
-    console.info(`Servidor rodando na porta: http://localhost:${port}`)
+    console.info(`Servidor rodando na porta: http://localhost:${port}`);
 });
-
-// const usuarioRepositorio = new UsuarioRepositorio;
-
-// const usuario = new Usuario("Alberto",true,18n);
-
-
-// console.log(
-//     usuarioRepositorio.criarUsario(usuario)
-// )
 

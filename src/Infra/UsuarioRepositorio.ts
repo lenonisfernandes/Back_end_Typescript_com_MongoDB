@@ -1,20 +1,21 @@
-import path from "path";
+import path from 'path';
 import fs from 'fs';
-import { DBSchema } from "./DBSchema";
-import { Usuario, UsuarioSchema } from "../usuarios";
+import { DBSchema } from './DBSchema';
+import { Usuario } from '../usuarios';
+import { UsuarioSchema } from './UsuarioSchema';
 
 export default class UsuarioRepositorio {
     private caminhoArquivo: string;
 
     constructor(caminho: string = 'fakeBD.json') {
-        this.caminhoArquivo = path.join(__dirname, caminho)
+        this.caminhoArquivo = path.join(__dirname, caminho);
     }
 
     private acessoDB(): DBSchema {
         const bdPuro = fs.readFileSync(this.caminhoArquivo, 'utf-8');
         return JSON.parse(bdPuro);
-    } 
-    private reescreverBD(DbAtualizado: DBSchema):boolean {
+    }
+    private reescreverBD(DbAtualizado: DBSchema): boolean {
         try {
             fs.writeFileSync(this.caminhoArquivo, JSON.stringify(DbAtualizado));
             return true;
@@ -24,12 +25,12 @@ export default class UsuarioRepositorio {
     }
 
     public getUsuarios(): UsuarioSchema[] {
-        const bd =  this.acessoDB();
+        const bd = this.acessoDB();
         const usuarios = bd.users;
         return usuarios;
     }
 
-    public getUsuarioPorId (id: number): UsuarioSchema | undefined {
+    public getUsuarioPorId(id: number): UsuarioSchema | undefined {
         const usuarios = this.getUsuarios();
         return usuarios.find(user => user.id === id);
     }
@@ -43,5 +44,5 @@ export default class UsuarioRepositorio {
         bdAtualizado.users = usuarios;
         this.reescreverBD(bdAtualizado);
         return usuarios;
-    } 
+    }
 }
