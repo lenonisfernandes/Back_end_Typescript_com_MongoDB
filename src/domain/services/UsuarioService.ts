@@ -1,14 +1,15 @@
 //CRUD     - READ
 import UsuarioRepositorio from '../../Infra/UsuarioRepositorio';
-import { Usuario, UsuarioSchema } from '../../usuarios';
+import { UsuarioSchema } from '../../Infra/UsuarioSchema';
+import { Usuario } from '../../Usuarios';
 
 const usuarioRepositorio = new UsuarioRepositorio();
 
 // hoisting
-function retornaUsuarios () {
+function retornaUsuarios() {
     return usuarioRepositorio.getUsuarios();
 }
-function retornaUsuarioPorId (id: number): UsuarioSchema | undefined {
+function retornaUsuarioPorId(id: number): UsuarioSchema | undefined {
     //console.log('tipo do id =', typeof id);
     return usuarioRepositorio.getUsuarioPorId(id);
 }
@@ -18,11 +19,11 @@ function criarUsario(usuario: Usuario): UsuarioSchema[] {
         { ...usuario }
     );
     return usuarios;
-} 
+}
 
 function atualizaUsuario(id: number, dadosAtualizacao: UsuarioSchema): UsuarioSchema | undefined {
     const usuario = usuarioRepositorio.getUsuarioPorId(id);
-    
+
     if (usuario) {
         console.log(`Usuário com ID ${id} não encontrado`);
         return;
@@ -30,14 +31,14 @@ function atualizaUsuario(id: number, dadosAtualizacao: UsuarioSchema): UsuarioSc
     throw new Error('Not implemented');
     // // Atualiza apenas os campos fornecidos
     // usuarioRepositorio.
-    
+
     // return usuarioRepositorio;
 }
 
 
 function deletaUsuario(id: number): UsuarioSchema | undefined {
     const usuario = usuarioRepositorio.getUsuarioPorId(id);
-    
+
     if (usuario) {
         console.log(`Usuário com ID ${id} não encontrado`);
         return;

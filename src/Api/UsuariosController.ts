@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import UsuarioRepositorio from '../Infra/UsuarioRepositorio';
-import { CriarUsarioDTO, Usuario, ViewUsuarioDTO } from '../usuarios';
+import { AtualizarUsarioDTO as AtualizarUsuarioDTO, CriarUsarioDTO, Usuario, ViewUsuarioDTO } from '../Usuarios';
 import { UsuarioSchema } from '../Infra/UsuarioSchema';
 
 class UsuarioController {
@@ -16,16 +16,19 @@ class UsuarioController {
         this.router.get('/', this.buscarUsuarios.bind(this));
         this.router.get('/:id', this.buscarUsuarioPorId.bind(this));
         this.router.post('/', this.criarUsuario.bind(this));
+        this.router.patch('/:id', this.AtualizarUsuarioPorId.bind(this));
         this.router.delete('/:id', this.deletarUsuarioPorId.bind(this));
     }
 
+    // TODO: validar bodies libs: Express validator ou Class Validator
+
     public buscarUsuarios(req: Request, res: Response) {
         const usuarios: UsuarioSchema[] = this.usuarioRepositorio.getUsuarios();
-        const usuariosDto = usuarios.map(usuario => ({
+        const usuariosDto: ViewUsuarioDTO[] = usuarios.map(usuario => ({
             nome: usuario.nome,
             ativo: usuario.ativo,
-            NumeroDoc: usuario.KAMV
-        }));
+            NumeroDoc: usuario.KAMV,
+        } as ViewUsuarioDTO));
         res.json(usuariosDto);
     }
 
@@ -52,9 +55,9 @@ class UsuarioController {
         const dadosUsuario: CriarUsarioDTO = req.body;
         let usuarios = this.usuarioRepositorio.getUsuarios();
         const idsExistentes = usuarios.map(usuario => usuario.id);
-        const nomeId = Math.max(...idsExistentes) + 1;
+        const novoId = Math.max(...idsExistentes) + 1;
         const usuario = new Usuario(
-            nomeId ?? '0',
+            novoId ?? '0',
             dadosUsuario.nome,
             dadosUsuario.ativo,
             dadosUsuario.saldo
@@ -62,6 +65,26 @@ class UsuarioController {
         this.usuarioRepositorio.criarUsario(usuario);
         usuarios = this.usuarioRepositorio.getUsuarios();
         res.json(usuarios);
+    }
+
+    public AtualizarUsuarioPorId(req: Request, res: Response) {
+        const id = req.params.id;
+        if (!id) {
+            res.json('Id não enviado!');
+            return;
+        }
+        const dadosUsuario: AtualizarUsuarioDTO = req.body;
+        const usuario = this.usuarioRepositorio.atualizarUsuario(+id, dadosUsuario);
+        if (usuario) {
+            const usuarioDto: ViewUsuarioDTO = {
+                nome: usuario.nome,
+                ativo: usuario.ativo,
+                NumeroDoc: usuario.KAMV,
+            };
+            res.json(usuarioDto);
+            return;
+        }
+        res.json('Usuario não encontrado');
     }
 
     public deletarUsuarioPorId(req: Request, res: Response) {

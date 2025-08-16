@@ -1,4 +1,4 @@
-import { UsuarioSchema } from '../usuarios';
+import { UsuarioSchema } from './UsuarioSchema';
 
 export type DBSchema = {
     users: UsuarioSchema[]

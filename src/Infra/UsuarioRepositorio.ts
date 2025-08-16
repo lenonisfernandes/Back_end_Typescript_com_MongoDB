@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import { DBSchema } from './DBSchema';
-import { Usuario } from '../usuarios';
+import { Usuario } from '../Usuarios';
 import { UsuarioSchema } from './UsuarioSchema';
 
 export default class UsuarioRepositorio {
@@ -61,12 +61,12 @@ export default class UsuarioRepositorio {
         return this.reescreverBD(bdAtualizado);
     }
 
-    public atualizarUsuario(id: number, dadosAtualizados: Partial<Usuario>): UsuarioSchema | null {
+    public atualizarUsuario(id: number, dadosAtualizados: Partial<Usuario>): UsuarioSchema | undefined {
         const usuarios = this.getUsuarios();
         const indiceUsuario = usuarios.findIndex(user => user.id === id);
 
         if (indiceUsuario === -1) {
-            return null; // Usuário não encontrado
+            return undefined; // Usuário não encontrado
         }
 
         // Atualiza apenas os campos fornecidos, mantendo os existentes
@@ -80,6 +80,6 @@ export default class UsuarioRepositorio {
         bdAtualizado.users = usuarios;
 
         const sucesso = this.reescreverBD(bdAtualizado);
-        return sucesso ? usuarios[indiceUsuario] : null;
+        return sucesso ? usuarios[indiceUsuario] : undefined;
     }
 }
