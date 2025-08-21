@@ -2,6 +2,8 @@ import { Router, Request, Response } from 'express';
 import UsuarioRepositorio from '../Infra/UsuarioRepositorio';
 import { AtualizarUsarioDTO as AtualizarUsuarioDTO, CriarUsarioDTO, Usuario, ViewUsuarioDTO } from '../Usuarios';
 import { UsuarioSchema } from '../Infra/UsuarioSchema';
+import { body, param, query, validationResult } from 'express-validator';
+import NotFoundException from './Exceptions/NotFoundExpection';
 
 class UsuarioController {
     private readonly usuarioRepositorio: UsuarioRepositorio;
@@ -14,8 +16,17 @@ class UsuarioController {
 
     public routes() {
         this.router.get('/', this.buscarUsuarios.bind(this));
-        this.router.get('/:id', this.buscarUsuarioPorId.bind(this));
-        this.router.post('/', this.criarUsuario.bind(this));
+        this.router.get('/:id', [
+            param('id').isNumeric().withMessage('O id deve ser numérico')
+        ], this.buscarUsuarioPorId.bind(this));
+        this.router.post('/', [
+            body('nome')
+                .exists().withMessage('O campo nome é obrigatório')
+                .isString().withMessage('O campo nome deve ser um texto'),
+            body('ativo')
+                .exists().withMessage('O campo ativo é obrigatório')
+                .isBoolean().withMessage('O campo ativo deve ser um boolean')
+        ], this.criarUsuario.bind(this));
         this.router.patch('/:id', this.AtualizarUsuarioPorId.bind(this));
         this.router.delete('/:id', this.deletarUsuarioPorId.bind(this));
     }
@@ -33,11 +44,13 @@ class UsuarioController {
     }
 
     public buscarUsuarioPorId(req: Request, res: Response) {
-        const id = req.params.id;
-        if (!id) {
-            res.json('Id não enviado!');
+        const erros = validationResult(req);
+        if (!erros.isEmpty()) {
+            res.status(400).json({ erros: erros.array() });
             return;
         }
+
+        const id = req.params.id;
         const usuario = this.usuarioRepositorio.getUsuarioPorId(+id);
         if (usuario) {
             const usuarioDto: ViewUsuarioDTO = {
@@ -48,10 +61,16 @@ class UsuarioController {
             res.json(usuarioDto);
             return;
         }
-        res.json('Usuario não encontrado');
+        throw new NotFoundException('Usuario não encontrado');
     }
 
     public criarUsuario(req: Request, res: Response) {
+        const erros = validationResult(req);
+        if (!erros.isEmpty()) {
+            res.status(400).json({ erros: erros.array() });
+            return;
+        }
+
         const dadosUsuario: CriarUsarioDTO = req.body;
         let usuarios = this.usuarioRepositorio.getUsuarios();
         const idsExistentes = usuarios.map(usuario => usuario.id);
@@ -64,7 +83,7 @@ class UsuarioController {
         );
         this.usuarioRepositorio.criarUsario(usuario);
         usuarios = this.usuarioRepositorio.getUsuarios();
-        res.json(usuarios);
+        res.status(201).json(usuarios);
     }
 
     public AtualizarUsuarioPorId(req: Request, res: Response) {
@@ -84,7 +103,7 @@ class UsuarioController {
             res.json(usuarioDto);
             return;
         }
-        res.json('Usuario não encontrado');
+        res.status(404).json('Usuario não encontrado');
     }
 
     public deletarUsuarioPorId(req: Request, res: Response) {
