@@ -91,7 +91,7 @@ export type CriarUsarioDTO = Omit<Usuario, 'id'>
 
 export type AtualizarUsarioDTO = Partial<CriarUsarioDTO>
 
-export type ViewUsuarioDTO = Omit<CriarUsarioDTO, 'senha'>
+export type ViewUsuarioDTO = Omit<Usuario, 'senha'>
 
 
 

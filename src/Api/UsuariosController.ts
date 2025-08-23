@@ -2,15 +2,21 @@ import { Router, Request, Response } from 'express';
 import UsuarioRepositorio from '../Infra/UsuarioRepositorio';
 import { AtualizarUsarioDTO as AtualizarUsuarioDTO, CriarUsarioDTO, Usuario, ViewUsuarioDTO } from '../Usuarios';
 import { UsuarioSchema } from '../Infra/UsuarioSchema';
-import { body, param, query, validationResult } from 'express-validator';
+import { body, param, validationResult } from 'express-validator';
 import NotFoundException from './Exceptions/NotFoundExpection';
+import UsuarioService from '../domain/services/UsuarioService';
 
 class UsuarioController {
     private readonly usuarioRepositorio: UsuarioRepositorio;
+    private readonly usuarioService: UsuarioService;
     public router: Router = Router();
 
-    constructor(usuarioRepositorio: UsuarioRepositorio) {
+    constructor(
+        usuarioRepositorio: UsuarioRepositorio,
+        usuarioService: UsuarioService,
+    ) {
         this.usuarioRepositorio = usuarioRepositorio;
+        this.usuarioService = usuarioService;
         this.routes();
     }
 
@@ -49,19 +55,11 @@ class UsuarioController {
             res.status(400).json({ erros: erros.array() });
             return;
         }
-
         const id = req.params.id;
-        const usuario = this.usuarioRepositorio.getUsuarioPorId(+id);
-        if (usuario) {
-            const usuarioDto: ViewUsuarioDTO = {
-                nome: usuario.nome,
-                ativo: usuario.ativo,
-                NumeroDoc: usuario.KAMV
-            };
-            res.json(usuarioDto);
-            return;
-        }
-        throw new NotFoundException('Usuario não encontrado');
+
+        const usuarioDto = this.usuarioService.buscarId(+id);
+
+        res.status(200).json(usuarioDto);
     }
 
     public criarUsuario(req: Request, res: Response) {
@@ -96,6 +94,7 @@ class UsuarioController {
         const usuario = this.usuarioRepositorio.atualizarUsuario(+id, dadosUsuario);
         if (usuario) {
             const usuarioDto: ViewUsuarioDTO = {
+                id: usuario.id,
                 nome: usuario.nome,
                 ativo: usuario.ativo,
                 NumeroDoc: usuario.KAMV,
