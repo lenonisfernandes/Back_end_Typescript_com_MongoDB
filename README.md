@@ -311,5 +311,142 @@ Adicionar o eslint no settings.json do vscode (Aperte 'ctrl + alt + p' e busque 
 }
 ```
 
+### Instalando documentação Swagger
+
+Instale as dependências
+
+```bash
+npm install swagger-jsdoc swagger-ui-express
+npm install -D @types/swagger-jsdoc @types/swagger-ui-express
+```
+Crie um arquivo de configuração do swagger
+```ts
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+import { Application } from 'express';
+
+const options = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'API de Usuários',
+      version: '1.0.0',
+      description: 'API REST para gerenciamento de usuários desenvolvida com Express e TypeScript',
+      contact: {
+        name: 'Desenvolvedor',
+        email: 'dev@exemplo.com'
+      },
+      license: {
+        name: 'MIT',
+        url: 'https://opensource.org/licenses/MIT'
+      }
+    },
+    servers: [
+      {
+        url: 'http://localhost:3000/api',
+        description: 'Servidor de Desenvolvimento'
+      },
+      {
+        url: 'https://api.exemplo.com',
+        description: 'Servidor de Produção'
+      }
+    ],
+  },
+  apis: [
+    './src/controllers/*.ts',  // Caminho para seus controllers
+    './src/routes/*.ts',       // Caminho para suas rotas (se houver)
+    './src/models/*.ts',       // Caminho para seus models (se houver)
+  ],
+};
+
+const specs = swaggerJsdoc(options);
+
+export const setupSwagger = (app: Application): void => {
+  // Middleware para servir a documentação Swagger
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
+    explorer: true,
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'API de Usuários - Documentação',
+    swaggerOptions: {
+      persistAuthorization: true,
+      displayRequestDuration: true,
+    }
+  }));
+
+  // Endpoint para obter a especificação OpenAPI em JSON
+  app.get('/api-docs.json', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(specs);
+  });
+
+  console.log('📚 Documentação Swagger disponível em: http://localhost:3000/api-docs');
+};
+
+export default setupSwagger;
+```
+
+Chame a configuração no main.ts
+
+```ts
+import setupSwagger from './Api/config/Swagger';
+
+const app = express();
+const port = 3000;
+
+app.use(express.json());
+
+setupSwagger(app);
+//... resto do código...
+```
+
+Insira JSDocs do swagger no método do controller que você quer adicionar a documentação. 
+
+Ex.:
+```ts
+// UsuarioController
+    /**
+     * @swagger
+     * /usuarios/{id}:
+     *   get:
+     *     summary: Busca um usuário por ID
+     *     tags: [Usuários]
+     *     description: Retorna os dados de um usuário específico pelo seu ID
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         schema:
+     *           type: number
+     *         required: true
+     *         description: ID numérico do usuário
+     *         example: 1
+     *     responses:
+     *       200:
+     *         description: Usuário encontrado com sucesso
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/ViewUsuarioDTO'
+     *             example:
+     *               id: 1
+     *               nome: "João Silva"
+     *               ativo: true
+     *               NumeroDoc: "12345678"
+     *       400:
+     *         $ref: '#/components/responses/BadRequest'
+     *       404:
+     *         $ref: '#/components/responses/NotFound'
+     */
+    public buscarUsuarioPorId(req: Request, res: Response) {
+        const erros = validationResult(req);
+        if (!erros.isEmpty()) {
+            throw new BadRequestException(erros.array());
+        }
+        const id = req.params.id;
+
+        const usuarioDto = this.usuarioService.buscarId(+id);
+
+        res.status(200).json(usuarioDto);
+    }
+```
 
 
