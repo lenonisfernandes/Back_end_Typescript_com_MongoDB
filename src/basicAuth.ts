@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import UnauthorizeException from './Api/Exceptions/UnauthorizeExpection';
 
 const USUARIO = 'UsuarioValido';
-const SENHA = 'SenhaValido';
+const SENHA = 'SenhaValida';
 
 export const basicAuthMiddleware = (req: Request, res: Response, next: NextFunction): void => {
     // Pega o header Authorization

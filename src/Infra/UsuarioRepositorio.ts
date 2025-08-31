@@ -61,8 +61,10 @@ export default class UsuarioRepositorio {
         return this.reescreverBD(bdAtualizado);
     }
 
-    public atualizarUsuario(id: number, dadosAtualizados: Partial<Usuario>): UsuarioSchema | undefined {
-        const usuarios = this.getUsuarios();
+    // PATCH - Atualização parcial (apenas campos fornecidos)
+    public atualizarUsuarioParcial(id: number, dadosAtualizados: Partial<Usuario>): UsuarioSchema | undefined {
+        const bd = this.acessoDB();
+        const usuarios = bd.users;
         const indiceUsuario = usuarios.findIndex(user => user.id === id);
 
         if (indiceUsuario === -1) {
@@ -70,16 +72,44 @@ export default class UsuarioRepositorio {
         }
 
         // Atualiza apenas os campos fornecidos, mantendo os existentes
+        // O spread operator (...) preserva os valores originais e sobrescreve apenas os campos enviados
         usuarios[indiceUsuario] = {
-            ...usuarios[indiceUsuario],
-            ...dadosAtualizados,
-            id // Garante que o ID não seja alterado
+            ...usuarios[indiceUsuario], // Mantém todos os campos existentes
+            ...dadosAtualizados,        // Sobrescreve apenas os campos fornecidos
+            id                          // Garante que o ID não seja alterado
         };
 
-        const bdAtualizado = this.acessoDB();
-        bdAtualizado.users = usuarios;
+        bd.users = usuarios;
+        const sucesso = this.reescreverBD(bd);
 
-        const sucesso = this.reescreverBD(bdAtualizado);
+        return sucesso ? usuarios[indiceUsuario] : undefined;
+    }
+
+    // PUT - Substituição completa (todos os campos obrigatórios)
+    public substituirUsuario(id: number, dadosCompletos: Usuario): UsuarioSchema | undefined {
+        const bd = this.acessoDB();
+        const usuarios = bd.users;
+        const indiceUsuario = usuarios.findIndex(user => user.id === id);
+
+        if (indiceUsuario === -1) {
+            return undefined; // Usuário não encontrado
+        }
+
+        // Substitui completamente o usuário com os novos dados
+        // Mantém apenas o ID original e alguns campos que não devem ser alterados pelo usuário
+        const usuarioAtualizado: UsuarioSchema = {
+            id,                           // ID original (não pode ser alterado)
+            nome: dadosCompletos.nome,
+            ativo: dadosCompletos.ativo,
+            saldo: dadosCompletos.saldo,
+            KAMV: usuarios[indiceUsuario].KAMV,  // Campo gerado pelo sistema, não alterável
+            // Qualquer outro campo não enviado será removido/resetado
+        };
+
+        usuarios[indiceUsuario] = usuarioAtualizado;
+        bd.users = usuarios;
+
+        const sucesso = this.reescreverBD(bd);
         return sucesso ? usuarios[indiceUsuario] : undefined;
     }
 }
