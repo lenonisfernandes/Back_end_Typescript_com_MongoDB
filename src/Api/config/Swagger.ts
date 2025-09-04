@@ -11,7 +11,7 @@ const options = {
             description: 'API REST para gerenciamento de usuários desenvolvida com Express e TypeScript',
             contact: {
                 name: 'Desenvolvedor',
-                email: 'dev@exemplo.com'
+                email: 'renan.torres@prof.infnet.edu.br'
             },
             license: {
                 name: 'MIT',
