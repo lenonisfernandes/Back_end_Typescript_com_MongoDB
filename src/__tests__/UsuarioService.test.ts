@@ -1,6 +1,6 @@
-import UsuarioService from '../domain/services/UsuarioService';
-import UsuarioRepositorio from '../Infra/UsuarioRepositorio';
-import { UsuarioSchema } from '../Infra/UsuarioSchema';
+import UsuarioService from '../2domain/services/UsuarioService';
+import UsuarioRepositorio from '../3infra/repositorios/UsuarioRepositorio';
+import { UsuarioSchema } from '../3infra/repositorios/UsuarioSchema';
 
 jest.mock('../Infra/UsuarioRepositorio');
 

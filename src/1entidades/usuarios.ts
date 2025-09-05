@@ -69,27 +69,11 @@ export class Diretor extends Usuario {
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // DTO - Data Transfer Object
 
 export type CriarUsarioDTO = Omit<Usuario, 'id'>
 
-export type AtualizarUsarioDTO = Partial<CriarUsarioDTO>
+export type AtualizarUsuarioDTO = Partial<CriarUsarioDTO>
 
 export type ViewUsuarioDTO = Omit<Usuario, 'senha'>
 

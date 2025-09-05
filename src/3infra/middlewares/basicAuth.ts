@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import UnauthorizeException from './Api/Exceptions/UnauthorizeExpection';
+import UnauthorizeException from '../../2domain/exceptions/UnauthorizeExpection';
 
 const USUARIO = 'UsuarioValido';
 const SENHA = 'SenhaValida';

@@ -1,10 +1,14 @@
 import path from 'path';
 import fs from 'fs';
 import { DBSchema } from './DBSchema';
-import { Usuario } from '../Usuarios';
 import { UsuarioSchema } from './UsuarioSchema';
+import { Usuario } from '../../1entidades/usuarios';
+import UsuarioRepositorioInterface from '../../2domain/interfaces/UsuarioRepositorioInterface';
+import 'reflect-metadata';
+import { injectable } from 'inversify';
 
-export default class UsuarioRepositorio {
+@injectable()
+export default class UsuarioRepositorio implements UsuarioRepositorioInterface {
     private caminhoArquivo: string;
 
     constructor(caminho: string = 'fakeBD.json') {

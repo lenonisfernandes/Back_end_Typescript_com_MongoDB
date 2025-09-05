@@ -1,11 +1,10 @@
 import { Router, Request, Response } from 'express';
-import UsuarioRepositorio from '../Infra/UsuarioRepositorio';
-import { AtualizarUsarioDTO as AtualizarUsuarioDTO, CriarUsarioDTO, Usuario, ViewUsuarioDTO } from '../Usuarios';
-import { UsuarioSchema } from '../Infra/UsuarioSchema';
+import { AtualizarUsuarioDTO, CriarUsarioDTO, Usuario } from '../../1entidades/usuarios';
 import { body, param, validationResult } from 'express-validator';
-import NotFoundException from './Exceptions/NotFoundExpection';
-import UsuarioService from '../domain/services/UsuarioService';
-import BadRequestException from './Exceptions/BadRequestException';
+import BadRequestException from '../../2domain/exceptions/BadRequestException';
+import UsuarioServiceInterface from '../../2domain/interfaces/UsuarioServiceInterface';
+import { inject, injectable } from 'inversify';
+import 'reflect-metadata';
 
 /**
  * @swagger
@@ -129,16 +128,16 @@ import BadRequestException from './Exceptions/BadRequestException';
  *   - name: Usuários
  *     description: Operações relacionadas aos usuários
  */
+
+@injectable()
 class UsuarioController {
-    private readonly usuarioRepositorio: UsuarioRepositorio;
-    private readonly usuarioService: UsuarioService;
+    private readonly usuarioService: UsuarioServiceInterface;
     public router: Router = Router();
 
     constructor(
-        usuarioRepositorio: UsuarioRepositorio,
-        usuarioService: UsuarioService,
+        @inject('UsuarioService')
+        usuarioService: UsuarioServiceInterface,
     ) {
-        this.usuarioRepositorio = usuarioRepositorio;
         this.usuarioService = usuarioService;
         this.routes();
     }
@@ -225,13 +224,8 @@ class UsuarioController {
      *                   example: "Credenciais inválidas"
      */
     public buscarUsuarios(req: Request, res: Response) {
-        const usuarios: UsuarioSchema[] = this.usuarioRepositorio.getUsuarios();
-        const usuariosDto: ViewUsuarioDTO[] = usuarios.map(usuario => ({
-            nome: usuario.nome,
-            ativo: usuario.ativo,
-            NumeroDoc: usuario.KAMV,
-        } as ViewUsuarioDTO));
-        res.json(usuariosDto);
+        const response = this.usuarioService.buscarTodos();
+        res.json(response);
     }
 
     /**
@@ -321,19 +315,9 @@ class UsuarioController {
         if (!erros.isEmpty()) {
             throw new BadRequestException(erros.array());
         }
-
         const dadosUsuario: CriarUsarioDTO = req.body;
-        let usuarios = this.usuarioRepositorio.getUsuarios();
-        const idsExistentes = usuarios.map(usuario => usuario.id);
-        const novoId = Math.max(...idsExistentes) + 1;
-        const usuario = new Usuario(
-            novoId ?? '0',
-            dadosUsuario.nome,
-            dadosUsuario.ativo,
-            dadosUsuario.saldo
-        );
-        this.usuarioRepositorio.criarUsario(usuario);
-        usuarios = this.usuarioRepositorio.getUsuarios();
+        const usuarios = this.usuarioService.criarUsuario(dadosUsuario);
+
         res.status(201).json(usuarios);
     }
 
@@ -396,25 +380,7 @@ class UsuarioController {
         const id = +req.params.id;
         const dadosAtualizacao: Partial<AtualizarUsuarioDTO> = req.body;
 
-        // Verifica se pelo menos um campo foi enviado
-        if (Object.keys(dadosAtualizacao).length === 0) {
-            res.status(400).json({
-                erro: 'Pelo menos um campo deve ser enviado para atualização'
-            });
-            return;
-        }
-
-
-        const usuario = this.usuarioRepositorio.atualizarUsuarioParcial(id, dadosAtualizacao);
-
-        if (!usuario) throw new NotFoundException('Usuário não encontrado');
-
-        const usuarioDto: ViewUsuarioDTO = {
-            id: usuario.id,
-            nome: usuario.nome,
-            ativo: usuario.ativo,
-            NumeroDoc: usuario.KAMV,
-        };
+        const usuarioDto = this.usuarioService.atualizarUsuarioParcial(id, dadosAtualizacao);
 
         res.status(200).json({
             mensagem: 'Usuário atualizado parcialmente com sucesso',
@@ -496,16 +462,7 @@ class UsuarioController {
         const id = +req.params.id;
         const dadosCompletos: Usuario = req.body;
 
-        const usuario = this.usuarioRepositorio.substituirUsuario(id, dadosCompletos);
-
-        if (!usuario) throw new NotFoundException('Usuário não encontrado');
-
-        const usuarioDto: ViewUsuarioDTO = {
-            id: usuario.id,
-            nome: usuario.nome,
-            ativo: usuario.ativo,
-            NumeroDoc: usuario.KAMV,
-        };
+        const usuarioDto = this.usuarioService.substituirUsuario(id, dadosCompletos);
 
         res.status(200).json({
             mensagem: 'Usuário substituído com sucesso',
@@ -552,12 +509,9 @@ class UsuarioController {
             res.json('Id não enviado!');
             return;
         }
-        const sucesso = this.usuarioRepositorio.deletarUsuario(+id);
-        if (sucesso) {
-            res.json('Usuario excluído com sucesso');
-            return;
-        }
-        res.json('Usuario não encontrado');
+        this.usuarioService.deletarUsuario(+id);
+        res.json('Usuario excluído com sucesso');
+        return;
     }
 }
 
