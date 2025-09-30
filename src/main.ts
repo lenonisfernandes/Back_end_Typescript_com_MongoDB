@@ -5,6 +5,9 @@ import { basicAuthMiddleware } from './3infra/middlewares/basicAuth';
 import ErrorHandler from './3infra/middlewares/ErrorHandler';
 import setupSwagger from './4webApi/config/Swagger';
 import NotFoundException from './2domain/exceptions/NotFoundExpection';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
 const port = 3000;

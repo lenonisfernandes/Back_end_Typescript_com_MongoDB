@@ -1,0 +1,20 @@
+[
+    {
+        "id": 123,
+        "nome": "Renan",
+        "ativo": true,
+        "senha": "secreta",
+        "ativoo": false
+    },
+    {
+        "id": 124,
+        "nome": "Jessica",
+        "ativo": true
+    },
+    {
+        "ativo": false,
+        "id": 43,
+        "nome": "Francisco",
+        "senha": "minha senha"
+    }
+]

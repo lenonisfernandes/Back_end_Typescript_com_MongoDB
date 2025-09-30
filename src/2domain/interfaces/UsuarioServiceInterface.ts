@@ -2,16 +2,16 @@ import { AtualizarUsuarioDTO, CriarUsarioDTO, Usuario, ViewUsuarioDTO } from '..
 
 export default interface UsuarioServiceInterface {
 
-    buscarId(id: number): ViewUsuarioDTO;
+    buscarId(id: number): Promise<ViewUsuarioDTO>;
 
-    buscarTodos(): ViewUsuarioDTO[];
+    buscarTodos(): Promise<ViewUsuarioDTO[]>;
 
-    criarUsuario(dadosUsuario: CriarUsarioDTO): Usuario[];
+    criarUsuario(dadosUsuario: CriarUsarioDTO): Promise<Usuario[]>;
 
-    atualizarUsuarioParcial(id: number, dadosAtualizacao: Partial<AtualizarUsuarioDTO>): ViewUsuarioDTO;
+    atualizarUsuarioParcial(id: number, dadosAtualizacao: Partial<AtualizarUsuarioDTO>): Promise<ViewUsuarioDTO>;
 
-    substituirUsuario(id: number, dadosCompletos: Usuario): ViewUsuarioDTO;
+    substituirUsuario(id: number, dadosCompletos: Usuario): Promise<ViewUsuarioDTO>;
 
-    deletarUsuario(id: number): boolean;
+    deletarUsuario(id: number): Promise<boolean>;
     // eslint-disable-next-line semi
 }

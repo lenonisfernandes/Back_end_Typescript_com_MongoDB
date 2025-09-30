@@ -223,8 +223,8 @@ class UsuarioController {
      *                   type: string
      *                   example: "Credenciais inválidas"
      */
-    public buscarUsuarios(req: Request, res: Response) {
-        const response = this.usuarioService.buscarTodos();
+    public async buscarUsuarios(req: Request, res: Response) {
+        const response = await this.usuarioService.buscarTodos();
         res.json(response);
     }
 
@@ -260,14 +260,14 @@ class UsuarioController {
      *       404:
      *         $ref: '#/components/responses/NotFound'
      */
-    public buscarUsuarioPorId(req: Request, res: Response) {
+    public async buscarUsuarioPorId(req: Request, res: Response) {
         const erros = validationResult(req);
         if (!erros.isEmpty()) {
             throw new BadRequestException(erros.array());
         }
         const id = req.params.id;
 
-        const usuarioDto = this.usuarioService.buscarId(+id);
+        const usuarioDto = await this.usuarioService.buscarId(+id);
 
         res.status(200).json(usuarioDto);
     }
@@ -310,13 +310,13 @@ class UsuarioController {
      *       400:
      *         $ref: '#/components/responses/BadRequest'
      */
-    public criarUsuario(req: Request, res: Response) {
+    public async criarUsuario(req: Request, res: Response): Promise<void> {
         const erros = validationResult(req);
         if (!erros.isEmpty()) {
             throw new BadRequestException(erros.array());
         }
         const dadosUsuario: CriarUsarioDTO = req.body;
-        const usuarios = this.usuarioService.criarUsuario(dadosUsuario);
+        const usuarios = await this.usuarioService.criarUsuario(dadosUsuario);
 
         res.status(201).json(usuarios);
     }
@@ -370,7 +370,7 @@ class UsuarioController {
      *       404:
      *         $ref: '#/components/responses/NotFound'
      */
-    public atualizarUsuarioParcial(req: Request, res: Response) {
+    public async atualizarUsuarioParcial(req: Request, res: Response) {
         const erros = validationResult(req);
         if (!erros.isEmpty()) {
             res.status(400).json({ erros: erros.array() });
@@ -380,7 +380,7 @@ class UsuarioController {
         const id = +req.params.id;
         const dadosAtualizacao: Partial<AtualizarUsuarioDTO> = req.body;
 
-        const usuarioDto = this.usuarioService.atualizarUsuarioParcial(id, dadosAtualizacao);
+        const usuarioDto = await this.usuarioService.atualizarUsuarioParcial(id, dadosAtualizacao);
 
         res.status(200).json({
             mensagem: 'Usuário atualizado parcialmente com sucesso',
@@ -452,7 +452,7 @@ class UsuarioController {
      *         $ref: '#/components/responses/NotFound'
      */
     // PUT - Substituição completa (substitui todos os campos)
-    public substituirUsuario(req: Request, res: Response) {
+    public async substituirUsuario(req: Request, res: Response) {
         const erros = validationResult(req);
         if (!erros.isEmpty()) {
             res.status(400).json({ erros: erros.array() });
@@ -462,7 +462,7 @@ class UsuarioController {
         const id = +req.params.id;
         const dadosCompletos: Usuario = req.body;
 
-        const usuarioDto = this.usuarioService.substituirUsuario(id, dadosCompletos);
+        const usuarioDto = await this.usuarioService.substituirUsuario(id, dadosCompletos);
 
         res.status(200).json({
             mensagem: 'Usuário substituído com sucesso',
@@ -503,13 +503,13 @@ class UsuarioController {
      *                 summary: ID não fornecido
      *                 value: "Id não enviado!"
      */
-    public deletarUsuarioPorId(req: Request, res: Response) {
+    public async deletarUsuarioPorId(req: Request, res: Response) {
         const id = req.params.id;
         if (!id) {
             res.json('Id não enviado!');
             return;
         }
-        this.usuarioService.deletarUsuario(+id);
+        await this.usuarioService.deletarUsuario(+id);
         res.json('Usuario excluído com sucesso');
         return;
     }

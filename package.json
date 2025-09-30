@@ -12,7 +12,7 @@
   "keywords": [],
   "author": "Renan Torres",
   "license": "MIT",
-  "description": "",
+  "description": "Para visualizar melhor este arquivo aperte ctrl + shit + v",
   "devDependencies": {
     "@eslint/js": "^9.33.0",
     "@eslint/json": "^0.13.1",
@@ -21,6 +21,7 @@
     "@types/express-validator": "^2.20.33",
     "@types/inversify": "^2.0.32",
     "@types/jest": "^30.0.0",
+    "@types/mongodb": "^4.0.6",
     "@types/node": "^24.2.0",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.8",
@@ -35,6 +36,7 @@
     "typescript-eslint": "^8.39.0"
   },
   "dependencies": {
+    "dotenv": "^17.2.2",
     "express": "^5.1.0",
     "express-validator": "^7.2.1",
     "fs": "^0.0.1-security",
@@ -42,5 +44,13 @@
     "reflect-metadata": "^0.2.2",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lenonisfernandes/Back_end_Typescript_com_MongoDB.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lenonisfernandes/Back_end_Typescript_com_MongoDB/issues"
+  },
+  "homepage": "https://github.com/lenonisfernandes/Back_end_Typescript_com_MongoDB#readme"
 }
