@@ -1,4 +1,3 @@
-import { promises as fs} from 'fs';
 import { DBSchema } from './DBSchema';
 import { UsuarioSchema } from './UsuarioSchema';
 import { Usuario } from '../../1entidades/usuarios';
@@ -6,10 +5,30 @@ import 'reflect-metadata';
 import { injectable } from 'inversify';
 import UsuarioAsyncRepositorioInterface from '../../2domain/interfaces/UsuarioAsyncRepositorioInterface';
 import dotenv from 'dotenv';
-import { Collection, Db, MongoClient, ObjectId, ServerApiVersion } from 'mongodb';
+import { Collection, Db, MongoClient, MongoServerError, ObjectId, ServerApiVersion } from 'mongodb';
 import DbException from '../../2domain/exceptions/BdException';
 
 dotenv.config();
+
+const jsonSchema = {
+    bsonType: 'object',
+    required: ['id', 'nome', 'ativo'],
+    properties: {
+        nome: {
+            bsonType: 'string',
+            description: 'deve ser uma string'
+        },
+        email: {
+            bsonType: 'string',
+            pattern: '^\\S+@\\S+\\.\\S+$',
+            description: 'deve ser um email válido'
+        },
+        ativo: {
+            bsonType: 'boolean',
+            description: 'deve ser verdadeiro ou falso'
+        }
+    },
+};
 
 @injectable()
 export default class UsuarioRepositorio implements UsuarioAsyncRepositorioInterface {
@@ -18,6 +37,22 @@ export default class UsuarioRepositorio implements UsuarioAsyncRepositorioInterf
         this.uri = process.env.MONGO_DB_KEY ?? '';
         this.dbName = 'tsmongo';
         this.collectionName = 'users';
+        this.createCollectionWithValidation().catch(console.error);
+    }
+
+    async createCollectionWithValidation() {
+        const client = new MongoClient(this.uri);
+        await client.connect();
+        const db = client.db(this.dbName);
+        try {
+            await db.createCollection(this.collectionName, { validator: { $jsonSchema: jsonSchema } });
+            console.log('Collection criada com validações!');
+        } catch (error) {
+            if( error instanceof MongoServerError && error.message.includes('already exists') ) 
+                console.info('Collection já existe. Nenhuma ação tomada.');
+        } finally {
+            await client.close();
+        }
     }
 
     private async getCollectionAndClient(): Promise<{ collection: Collection<UsuarioSchema>, client: MongoClient }> {
@@ -103,44 +138,37 @@ export default class UsuarioRepositorio implements UsuarioAsyncRepositorioInterf
     }
 
     public async deletarUsuario(id: number): Promise<boolean> {
-        // const usuarios = await this.getUsuarios();
-        // const indiceUsuario = usuarios.findIndex(user => user.id === id);
-
-        // if (indiceUsuario === -1) {
-        //     return false; // Usuário não encontrado
-        // }
-
-        // usuarios.splice(indiceUsuario, 1);
-        // const bdAtualizado = await this.acessoDB();
-        // bdAtualizado.users = usuarios;
-
-        // return this.reescreverBD(bdAtualizado);
-        return false;
+        const { collection, client } = await this.getCollectionAndClient();
+        try {
+            const results = await collection.deleteOne({ id });
+            return (results.deletedCount > 0);
+        } catch (error) {
+            console.error(error);
+            throw new DbException('Erro ao deletar usuário no banco de dados');
+        } finally {
+            client.close();
+        }
     }
 
     // PATCH - Atualização parcial (apenas campos fornecidos)
     public async atualizarUsuarioParcial(id: number, dadosAtualizados: Partial<Usuario>): Promise<UsuarioSchema | undefined> {
-        // const bd = await this.acessoDB();
-        // const usuarios = bd.users;
-        // const indiceUsuario = usuarios.findIndex(user => user.id === id);
+        const { collection, client } = await this.getCollectionAndClient();
 
-        // if (indiceUsuario === -1) {
-        //     return undefined; // Usuário não encontrado
-        // }
+        try {
+            const dadosPadraoMongo = {
+                $set: {
+                    ...(dadosAtualizados.nome && { nome: dadosAtualizados.nome }),
+                    ...((dadosAtualizados.ativo !== undefined) && { ativo: dadosAtualizados.ativo }),
+                }
+            }
+            await collection.updateOne( { id } , {dadosPadraoMongo} );
+            return await this.getUsuarioPorId(id);
 
-        // // Atualiza apenas os campos fornecidos, mantendo os existentes
-        // // O spread operator (...) preserva os valores originais e sobrescreve apenas os campos enviados
-        // usuarios[indiceUsuario] = {
-        //     ...usuarios[indiceUsuario], // Mantém todos os campos existentes
-        //     ...dadosAtualizados,        // Sobrescreve apenas os campos fornecidos
-        //     id                          // Garante que o ID não seja alterado
-        // };
+        } catch (error) {
 
-        // bd.users = usuarios;
-        // const sucesso = await this.reescreverBD(bd);
-
-        // return sucesso ? usuarios[indiceUsuario] : undefined;
-        return undefined;
+        } finally {
+            client.close();
+        }
     }
 
     // PUT - Substituição completa (todos os campos obrigatórios)
