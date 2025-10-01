@@ -1,16 +1,16 @@
 import { Container } from 'inversify';
 import UsuarioRepositorioInterface from '../../2domain/interfaces/UsuarioAsyncRepositorioInterface';
-import UsuarioRepositorio from '../../3infra/repositorios/UsuarioAsyncMongoRepositorio';
 import UsuarioController from '../controllers/UsuariosController';
 import UsuarioServiceInterface from '../../2domain/interfaces/UsuarioServiceInterface';
 import UsuarioService from '../../2domain/services/UsuarioService';
+import UsuarioMongooseRepositorio from '../../3infra/repositorios/UsuarioAsyncMongooseRepositorio';
 
 
 const container = new Container();
 
 container
     .bind<UsuarioRepositorioInterface>('UsuarioRepositorio')
-    .to(UsuarioRepositorio).inRequestScope();
+    .to(UsuarioMongooseRepositorio).inRequestScope();
 container
     .bind<UsuarioServiceInterface>('UsuarioService')
     .to(UsuarioService).inRequestScope();

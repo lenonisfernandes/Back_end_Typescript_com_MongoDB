@@ -1,5 +1,5 @@
 import { DBSchema } from './DBSchema';
-import { UsuarioSchema } from './UsuarioSchema';
+import { UsuarioSchemaDriver } from './UsuarioSchema';
 import { Usuario } from '../../1entidades/usuarios';
 import 'reflect-metadata';
 import { injectable } from 'inversify';
@@ -31,10 +31,10 @@ const jsonSchema = {
 };
 
 @injectable()
-export default class UsuarioRepositorio implements UsuarioAsyncRepositorioInterface {
+export default class UsuarioMongoRepositorio implements UsuarioAsyncRepositorioInterface {
     private uri: string;
     constructor(private dbName: string = 'tsmongo', private collectionName: string = 'users') {
-        this.uri = process.env.MONGO_DB_KEY ?? '';
+        this.uri = `${process.env.MONGO_DB_KEY}?${process.env.DB_OPTIONS} ?? ''`;
         this.dbName = 'tsmongo';
         this.collectionName = 'users';
         this.createCollectionWithValidation().catch(console.error);
@@ -55,7 +55,7 @@ export default class UsuarioRepositorio implements UsuarioAsyncRepositorioInterf
         }
     }
 
-    private async getCollectionAndClient(): Promise<{ collection: Collection<UsuarioSchema>, client: MongoClient }> {
+    private async getCollectionAndClient(): Promise<{ collection: Collection<UsuarioSchemaDriver>, client: MongoClient }> {
         const client = new MongoClient(this.uri, {
                 serverApi: {
                     version: ServerApiVersion.v1,
@@ -67,7 +67,7 @@ export default class UsuarioRepositorio implements UsuarioAsyncRepositorioInterf
         try {
             await client.connect();
             const db = client.db(this.dbName);
-            const collection = db.collection<UsuarioSchema>(this.collectionName);
+            const collection = db.collection<UsuarioSchemaDriver>(this.collectionName);
 
             return { collection, client };
         } catch (error) {
@@ -81,21 +81,11 @@ export default class UsuarioRepositorio implements UsuarioAsyncRepositorioInterf
         }
     }
     
-    private async reescreverBD(DbAtualizado: DBSchema): Promise<boolean> {
-        // try {
-        //     await fs.writeFile(this.caminhoArquivo, JSON.stringify(DbAtualizado, null, 2));
-        //     return true;
-        // } catch (error) {
-        //     console.error('Erro ao escrever no banco de dados:', error);
-            return false;
-        // }
-    }
-
-    public async getUsuarios(): Promise<UsuarioSchema[]> {
+    public async getUsuarios(): Promise<Usuario[]> {
         const objeto = await this.getCollectionAndClient();
         try {
-            const users = await objeto.collection.find({}).toArray();
-            return users;
+            const users: UsuarioSchemaDriver[] = await objeto.collection.find({}).toArray();
+            return users.map(u => new Usuario(u.id, u.nome, u.ativo));
         } catch {
             throw new DbException('Erro ao buscar usuários no banco de dados');            
         } finally {
@@ -103,11 +93,11 @@ export default class UsuarioRepositorio implements UsuarioAsyncRepositorioInterf
         }
     }
 
-    public async getUsuarioPorId(id: number): Promise<UsuarioSchema | undefined> {
+    public async getUsuarioPorId(id: number): Promise<Usuario | undefined> {
         const { collection, client } = await this.getCollectionAndClient();
         try {
             const user = await collection.findOne({id: id});
-            return user ?? undefined;
+            return user ? new Usuario(user.id, user.nome, user.ativo) : undefined;
         } catch {
             throw new DbException('Erro ao buscar usuário por ID no banco de dados');
         } finally {
@@ -115,7 +105,7 @@ export default class UsuarioRepositorio implements UsuarioAsyncRepositorioInterf
         }
     }
 
-    public async criarUsario(usuario: Usuario): Promise<UsuarioSchema[]> {
+    public async criarUsario(usuario: Usuario): Promise<Usuario[]> {
         const { collection, client } = await this.getCollectionAndClient();
         const maiorId = await collection.find().sort({id: -1}).limit(1).toArray();
 
@@ -125,7 +115,7 @@ export default class UsuarioRepositorio implements UsuarioAsyncRepositorioInterf
                 id: maiorId[0].id + 1,
                 nome: usuario.nome,
                 ativo: usuario.ativo
-            } as UsuarioSchema;
+            } as UsuarioSchemaDriver;
 
 
             await collection.insertOne(novoUsuario);
@@ -151,7 +141,7 @@ export default class UsuarioRepositorio implements UsuarioAsyncRepositorioInterf
     }
 
     // PATCH - Atualização parcial (apenas campos fornecidos)
-    public async atualizarUsuarioParcial(id: number, dadosAtualizados: Partial<Usuario>): Promise<UsuarioSchema | undefined> {
+    public async atualizarUsuarioParcial(id: number, dadosAtualizados: Partial<Usuario>): Promise<Usuario | undefined> {
         const { collection, client } = await this.getCollectionAndClient();
 
         try {
@@ -172,7 +162,7 @@ export default class UsuarioRepositorio implements UsuarioAsyncRepositorioInterf
     }
 
     // PUT - Substituição completa (todos os campos obrigatórios)
-    public async substituirUsuario(id: number, dadosCompletos: Usuario): Promise<UsuarioSchema | undefined> {
+    public async substituirUsuario(id: number, dadosCompletos: Usuario): Promise<UsuarioSchemaDriver | undefined> {
         // const bd = await this.acessoDB();
         // const usuarios = bd.users;
         // const indiceUsuario = usuarios.findIndex(user => user.id === id);

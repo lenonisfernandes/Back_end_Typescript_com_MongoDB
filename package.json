@@ -22,6 +22,7 @@
     "@types/inversify": "^2.0.32",
     "@types/jest": "^30.0.0",
     "@types/mongodb": "^4.0.6",
+    "@types/mongoose": "^5.11.96",
     "@types/node": "^24.2.0",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.8",
@@ -41,6 +42,7 @@
     "express-validator": "^7.2.1",
     "fs": "^0.0.1-security",
     "inversify": "^7.9.1",
+    "mongoose": "^8.18.3",
     "reflect-metadata": "^0.2.2",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"

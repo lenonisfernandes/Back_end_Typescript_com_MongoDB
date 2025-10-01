@@ -1,5 +1,5 @@
-import { UsuarioSchema } from './UsuarioSchema';
+import { UsuarioSchemaDriver } from './UsuarioSchema';
 
 export type DBSchema = {
-    users: UsuarioSchema[]
+    users: UsuarioSchemaDriver[]
 }

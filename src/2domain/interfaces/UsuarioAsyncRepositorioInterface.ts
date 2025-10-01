@@ -1,13 +1,12 @@
-import { UsuarioSchema } from '../../3infra/repositorios/UsuarioSchema';
 import { Usuario } from '../../1entidades/usuarios';
 
 interface UsuarioAsyncRepositorioInterface {
-    getUsuarios(): Promise<UsuarioSchema[]>;
-    getUsuarioPorId(id: number): Promise<UsuarioSchema | undefined>;
-    criarUsario(usuario: Usuario): Promise<UsuarioSchema[]>;
+    getUsuarios(): Promise<Usuario[]>;
+    getUsuarioPorId(id: number): Promise<Usuario | undefined>;
+    criarUsario(usuario: Usuario): Promise<Usuario[]>;
     deletarUsuario(id: number): Promise<boolean>;
-    atualizarUsuarioParcial(id: number, dadosAtualizados: Partial<Usuario>): Promise<UsuarioSchema | undefined>;
-    substituirUsuario(id: number, dadosCompletos: Usuario): Promise<UsuarioSchema | undefined>;
+    atualizarUsuarioParcial(id: number, dadosAtualizados: Partial<Usuario>): Promise<Usuario | undefined>;
+    substituirUsuario(id: number, dadosCompletos: Usuario): Promise<Usuario | undefined>;
 }
 
 

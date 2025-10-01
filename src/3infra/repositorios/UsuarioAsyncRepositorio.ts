@@ -1,7 +1,7 @@
 import path from 'path';
 import { promises as fs} from 'fs';
 import { DBSchema } from './DBSchema';
-import { UsuarioSchema } from './UsuarioSchema';
+import { UsuarioSchemaDriver } from './UsuarioSchema';
 import { Usuario } from '../../1entidades/usuarios';
 import 'reflect-metadata';
 import { injectable } from 'inversify';
@@ -42,18 +42,18 @@ export default class UsuarioRepositorio implements UsuarioAsyncRepositorioInterf
         }
     }
 
-    public async getUsuarios(): Promise<UsuarioSchema[]> {
+    public async getUsuarios(): Promise<UsuarioSchemaDriver[]> {
         const bd = await this.acessoDB();
         const usuarios = bd.users;
         return usuarios;
     }
 
-    public async getUsuarioPorId(id: number): Promise<UsuarioSchema | undefined> {
+    public async getUsuarioPorId(id: number): Promise<UsuarioSchemaDriver | undefined> {
         const usuarios = await this.getUsuarios();
         return usuarios.find(user => user.id === id);
     }
 
-    public async criarUsario(usuario: Usuario): Promise<UsuarioSchema[]> {
+    public async criarUsario(usuario: Usuario): Promise<UsuarioSchemaDriver[]> {
         const usuarios = await this.getUsuarios();
         usuarios.push(
             { ...usuario }
@@ -80,7 +80,7 @@ export default class UsuarioRepositorio implements UsuarioAsyncRepositorioInterf
     }
 
     // PATCH - Atualização parcial (apenas campos fornecidos)
-    public async atualizarUsuarioParcial(id: number, dadosAtualizados: Partial<Usuario>): Promise<UsuarioSchema | undefined> {
+    public async atualizarUsuarioParcial(id: number, dadosAtualizados: Partial<Usuario>): Promise<UsuarioSchemaDriver | undefined> {
         const bd = await this.acessoDB();
         const usuarios = bd.users;
         const indiceUsuario = usuarios.findIndex(user => user.id === id);
@@ -104,7 +104,7 @@ export default class UsuarioRepositorio implements UsuarioAsyncRepositorioInterf
     }
 
     // PUT - Substituição completa (todos os campos obrigatórios)
-    public async substituirUsuario(id: number, dadosCompletos: Usuario): Promise<UsuarioSchema | undefined> {
+    public async substituirUsuario(id: number, dadosCompletos: Usuario): Promise<UsuarioSchemaDriver | undefined> {
         const bd = await this.acessoDB();
         const usuarios = bd.users;
         const indiceUsuario = usuarios.findIndex(user => user.id === id);
@@ -115,7 +115,7 @@ export default class UsuarioRepositorio implements UsuarioAsyncRepositorioInterf
 
         // Substitui completamente o usuário com os novos dados
         // Mantém apenas o ID original e alguns campos que não devem ser alterados pelo usuário
-        const usuarioAtualizado: UsuarioSchema = {
+        const usuarioAtualizado: UsuarioSchemaDriver = {
             id,                           // ID original (não pode ser alterado)
             nome: dadosCompletos.nome,
             ativo: dadosCompletos.ativo,
