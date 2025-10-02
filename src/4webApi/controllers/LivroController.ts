@@ -21,6 +21,7 @@ class LivroController {
         this.router.get('/', this.buscarTodos.bind(this));
         this.router.post('/', this.criar.bind(this));
         this.router.delete('/:id', this.deletar.bind(this));
+        this.router.patch('/adicionar-autor', this.adicionarAutor.bind(this));
     }
 
     async buscarTodos(req: Request, res: Response): Promise<void> {
@@ -40,7 +41,11 @@ class LivroController {
         res.status(204).json('Livro deletado com sucesso');
     }
 
-    
+    async adicionarAutor(req: Request, res: Response): Promise<void> { 
+        const {userId, bookData}: {userId: number, bookData: Livro} = req.body;
+        const livro = await this.livroService.adicionarAutor(userId, bookData);
+        res.status(200).json(livro);
+    }
 }
 
 

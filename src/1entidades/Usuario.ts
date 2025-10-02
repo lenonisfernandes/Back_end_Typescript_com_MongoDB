@@ -1,3 +1,4 @@
+import Livro from "./Livro";
 import ContatoVO from "./VO/ContatoVO";
 
 export class Usuario {
@@ -9,8 +10,21 @@ export class Usuario {
     NumeroDoc?: number;
     senha?: string;
     sobrenome?: string;
+    livros: Livro[] = [];
 
-    constructor(id: number, nome: string, ativo: boolean, contato?: ContatoVO, saldo?: bigint, sobrenome?: string) {
+    // public get livros(): Livro[] {
+    //     return this._livros;
+    // }
+
+    constructor(
+        id: number, 
+        nome: string, 
+        ativo: boolean, 
+        contato: ContatoVO, 
+        livros: Livro[], 
+        saldo?: bigint, 
+        sobrenome?: string
+    ) {
         this.id = id;
         this.nome = nome;
         this.ativo = ativo;
@@ -18,8 +32,14 @@ export class Usuario {
         this.saldo = saldo;
         this.senha = 'minha senha';
         this.sobrenome = sobrenome;
+        this.livros = livros;
     }
+
+    // public adicionarLivros(livros: Livro[]): void {
+    //     this._livros.push(...livros);
+    // }
 }
+
 
 // class-validator 
 
@@ -52,12 +72,13 @@ export class Professor extends Usuario {
         id: number,
         nome: string,
         ativo: boolean,
-        contato?: ContatoVO,
+        contato: ContatoVO,
+        livros: Livro[],
         saldo?: bigint,
         sobrenome?: string,
         supervisor?: string,
     ) {
-        super(id, nome, ativo, contato, saldo, sobrenome);
+        super(id, nome, ativo, contato, livros, saldo, sobrenome);
         this.supervisor = supervisor;
     }
 

@@ -3,6 +3,7 @@ import 'reflect-metadata';
  import LivroRepositorioInterface from '../interfaces/LivroRepositorioInterface';
 import LivroServiceInterface from '../interfaces/LivroServiceInterface';
 import Livro from '../../1entidades/Livro';
+import NotFoundException from '../exceptions/NotFoundExpection';
 
 @injectable()
 export default class LivroService implements LivroServiceInterface {
@@ -29,5 +30,10 @@ export default class LivroService implements LivroServiceInterface {
         throw new Error('Livro não encontrado');
     }
 
-    
+    async adicionarAutor(userId: number, bookData: Livro): Promise<Livro | undefined> {
+        const livro = await this.livroRepositorio.adicionarAutor(userId, bookData);
+        if (!livro) throw new NotFoundException('Livro não encontrado');
+        return livro;
+    }
+
 }
