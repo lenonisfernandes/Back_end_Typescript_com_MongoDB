@@ -7,7 +7,6 @@ class MongooseConfig {
     static async connect(): Promise<void> {
         try {
             const CHAVEMONGO = `${process.env.MONGO_DB_KEY}${process.env.DATABASE}?${process.env.DB_OPTIONS}`;
-            console.log(CHAVEMONGO);
             if(!CHAVEMONGO) throw new Error("Chave de BD não encontrada.");
             const connectionOptions: ConnectOptions = { connectTimeoutMS: 5000 };
             await mongoose.connect(CHAVEMONGO, connectionOptions);

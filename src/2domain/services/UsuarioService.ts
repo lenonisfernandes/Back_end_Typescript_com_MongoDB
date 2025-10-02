@@ -1,8 +1,9 @@
-import { ViewUsuarioDTO, CriarUsarioDTO, AtualizarUsuarioDTO, Usuario } from '../../1entidades/usuarios';
+import { ViewUsuarioDTO, CriarUsarioDTO, AtualizarUsuarioDTO, Usuario } from '../../1entidades/Usuario';
 import NotFoundException from '../exceptions/NotFoundExpection';
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 import UsuarioRepositorioInterface from '../interfaces/UsuarioAsyncRepositorioInterface';
+import ContatoVO from '../../1entidades/VO/ContatoVO';
 
 @injectable()
 export default class UsuarioService {
@@ -13,6 +14,15 @@ export default class UsuarioService {
         usuarioRepositorio: UsuarioRepositorioInterface
     ) {
         this.usuarioRepositorio = usuarioRepositorio;
+    }
+
+    private usuarioSchemaParses(usuario: Usuario): ViewUsuarioDTO {
+        return {
+            id: usuario.id,
+            nome: usuario.nome,
+            ativo: usuario.ativo,
+            NumeroDoc: usuario.NumeroDoc,
+        };
     }
 
     async buscarId(id: number): Promise<ViewUsuarioDTO> {
@@ -37,6 +47,7 @@ export default class UsuarioService {
             id: usuario.id,
             nome: usuario.nome,
             ativo: usuario.ativo,
+            contato: usuario.contato,
             NumeroDoc: usuario.NumeroDoc,
         } as ViewUsuarioDTO));
     }
@@ -50,6 +61,7 @@ export default class UsuarioService {
             novoId,
             dadosUsuario.nome,
             dadosUsuario.ativo,
+            dadosUsuario.contato ?? new ContatoVO(),
             dadosUsuario.saldo
         );
 

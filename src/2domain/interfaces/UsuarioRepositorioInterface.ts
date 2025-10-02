@@ -1,5 +1,5 @@
-import { UsuarioSchemaDriver } from '../../3infra/repositorios/UsuarioSchema';
-import { Usuario } from '../../1entidades/usuarios';
+import { UsuarioSchemaDriver } from '../../3infra/repositorios/UsuarioSchemaDriver';
+import { Usuario } from '../../1entidades/Usuario';
 
 interface UsuarioRepositorioInterface {
     getUsuarios(): UsuarioSchemaDriver[];

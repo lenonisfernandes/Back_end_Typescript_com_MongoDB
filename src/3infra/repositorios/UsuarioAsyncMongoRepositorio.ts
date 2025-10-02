@@ -1,6 +1,6 @@
 import { DBSchema } from './DBSchema';
-import { UsuarioSchemaDriver } from './UsuarioSchema';
-import { Usuario } from '../../1entidades/usuarios';
+import { UsuarioSchemaDriver } from './UsuarioSchemaDriver';
+import { Usuario } from '../../1entidades/Usuario';
 import 'reflect-metadata';
 import { injectable } from 'inversify';
 import UsuarioAsyncRepositorioInterface from '../../2domain/interfaces/UsuarioAsyncRepositorioInterface';

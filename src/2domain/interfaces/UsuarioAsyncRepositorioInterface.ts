@@ -1,4 +1,4 @@
-import { Usuario } from '../../1entidades/usuarios';
+import { Usuario } from '../../1entidades/Usuario';
 
 interface UsuarioAsyncRepositorioInterface {
     getUsuarios(): Promise<Usuario[]>;

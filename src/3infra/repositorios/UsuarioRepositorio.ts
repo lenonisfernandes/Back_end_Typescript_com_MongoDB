@@ -1,8 +1,8 @@
 import path from 'path';
 import fs from 'fs';
 import { DBSchema } from './DBSchema';
-import { UsuarioSchemaDriver } from './UsuarioSchema';
-import { Usuario } from '../../1entidades/usuarios';
+import { UsuarioSchemaDriver } from './UsuarioSchemaDriver';
+import { Usuario } from '../../1entidades/Usuario';
 import UsuarioRepositorioInterface from '../../2domain/interfaces/UsuarioRepositorioInterface';
 import 'reflect-metadata';
 import { injectable } from 'inversify';
@@ -42,7 +42,10 @@ export default class UsuarioRepositorio implements UsuarioRepositorioInterface {
     public criarUsario(usuario: Usuario): UsuarioSchemaDriver[] {
         const usuarios = this.getUsuarios();
         usuarios.push(
-            { ...usuario }
+            {
+                ...usuario,
+                contato: usuario.contato ? { ...usuario.contato } as { [key: string]: unknown } : undefined
+            }
         );
         const bdAtualizado = this.acessoDB();
         bdAtualizado.users = usuarios;
@@ -80,6 +83,9 @@ export default class UsuarioRepositorio implements UsuarioRepositorioInterface {
         usuarios[indiceUsuario] = {
             ...usuarios[indiceUsuario], // Mantém todos os campos existentes
             ...dadosAtualizados,        // Sobrescreve apenas os campos fornecidos
+            contato: dadosAtualizados.contato
+                ? { ...dadosAtualizados.contato } as { [key: string]: unknown }
+                : usuarios[indiceUsuario].contato,
             id                          // Garante que o ID não seja alterado
         };
 

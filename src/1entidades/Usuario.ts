@@ -1,17 +1,20 @@
+import ContatoVO from "./VO/ContatoVO";
+
 export class Usuario {
     id: number;
     nome: string;
     ativo: boolean = true;
+    contato?: ContatoVO = {};
     saldo?: bigint = 12n;
     NumeroDoc?: number;
     senha?: string;
     sobrenome?: string;
 
-    constructor(id: number, nome: string, ativo: boolean, saldo?: bigint, sobrenome?: string) {
-        //this.id = Math.round(Math.random() * 100);
+    constructor(id: number, nome: string, ativo: boolean, contato?: ContatoVO, saldo?: bigint, sobrenome?: string) {
         this.id = id;
         this.nome = nome;
         this.ativo = ativo;
+        this.contato = contato ?? new ContatoVO();
         this.saldo = saldo;
         this.senha = 'minha senha';
         this.sobrenome = sobrenome;
@@ -49,11 +52,12 @@ export class Professor extends Usuario {
         id: number,
         nome: string,
         ativo: boolean,
+        contato?: ContatoVO,
         saldo?: bigint,
         sobrenome?: string,
         supervisor?: string,
     ) {
-        super(id, nome, ativo, saldo, sobrenome);
+        super(id, nome, ativo, contato, saldo, sobrenome);
         this.supervisor = supervisor;
     }
 
